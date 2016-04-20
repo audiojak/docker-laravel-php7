@@ -1,6 +1,13 @@
 FROM php:7-apache
 
-RUN apt-get install mcrypt php7.0-mcrypt
+RUN apt-get update && apt-get install -y \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libpng12-dev \
+    && docker-php-ext-install -j$(nproc) iconv mcrypt \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd
 
 RUN sed -i 's#DocumentRoot /var/www/html#DocumentRoot /var/www/laravel/laravel/public#' /etc/apache2/apache2.conf
 RUN sed -i 's#Listen 80#Listen 8080#' /etc/apache2/apache2.conf
